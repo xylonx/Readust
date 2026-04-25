@@ -1,18 +1,24 @@
+use crate::utils::{s3::S3Settings, serdefmt::duration_seconds};
+
 #[derive(Debug, serde::Deserialize)]
 pub struct Settings {
     pub application: ApplicationSettings,
 
     pub database: DBSettings,
+
+    pub s3: S3Settings,
 }
 
 #[derive(Debug, serde::Deserialize)]
 pub struct ApplicationSettings {
     pub addr: String,
 
-    pub timeout_secs: u64,
+    #[serde(with = "duration_seconds")]
+    pub timeout: chrono::Duration,
 
     pub jwt_secret: String,
-    pub jwt_token_expires: i64,
+    #[serde(with = "duration_seconds")]
+    pub jwt_token_expires_in: chrono::Duration,
 
     pub anon_token: String,
 

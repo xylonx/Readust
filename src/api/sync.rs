@@ -91,7 +91,7 @@ async fn pull_sync(
         data.books = db::book::get_books(
             &state.pool,
             &auth.user.id,
-            query.since.clone(),
+            query.since,
             query.book_hash.clone(),
             query.meta_hash.clone(),
         )
@@ -102,7 +102,7 @@ async fn pull_sync(
         data.configs = db::config::get_book_configs(
             &state.pool,
             &auth.user.id,
-            query.since.clone(),
+            query.since,
             query.book_hash.clone(),
             query.meta_hash.clone(),
         )

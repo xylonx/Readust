@@ -1,4 +1,4 @@
-#[allow(dead_code)]
+#![allow(dead_code)]
 
 pub mod duration_ms {
     use chrono::Duration;
@@ -17,6 +17,26 @@ pub mod duration_ms {
     {
         let milli_seconds = i64::deserialize(deserializer)?;
         Ok(Duration::milliseconds(milli_seconds))
+    }
+}
+
+pub mod duration_seconds {
+    use chrono::Duration;
+    use serde::{Deserialize, Deserializer, Serializer};
+
+    pub fn serialize<S>(duration: &Duration, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_i64(duration.num_seconds())
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Duration, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let seconds = i64::deserialize(deserializer)?;
+        Ok(Duration::seconds(seconds))
     }
 }
 
@@ -60,8 +80,7 @@ pub mod option_timestamp_mix_ts_str {
         D: Deserializer<'de>,
     {
         Ok(Option::<i64>::deserialize(deserializer)?
-            .map(DateTime::<Utc>::from_timestamp_millis)
-            .flatten())
+            .and_then(DateTime::<Utc>::from_timestamp_millis))
     }
 }
 
@@ -96,4 +115,12 @@ where
     use serde::Deserialize;
     let o: Option<String> = Option::deserialize(d)?;
     Ok(o.filter(|s| !s.is_empty()))
+}
+
+pub fn ok_or_default<'de, T, D>(deserializer: D) -> Result<T, D::Error>
+where
+    T: serde::Deserialize<'de> + Default,
+    D: serde::Deserializer<'de>,
+{
+    Ok(T::deserialize(deserializer).unwrap_or_default())
 }

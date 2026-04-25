@@ -129,3 +129,49 @@ pub struct File {
     pub updated_at: Option<DateTime<Utc>>,
     pub deleted_at: Option<DateTime<Utc>>,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[serde(rename_all = "camelCase")]
+pub struct BookHashStat {
+    pub book_hash: Option<String>,
+    pub file_count: i64,
+    pub total_size: i64,
+}
+
+#[derive(Debug, Default, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SortByKind {
+    #[default]
+    CreatedAt,
+    UpdatedAt,
+    FileSize,
+    FileKey,
+}
+
+impl SortByKind {
+    pub fn as_sql_column(&self) -> &'static str {
+        match self {
+            Self::CreatedAt => "created_at",
+            Self::UpdatedAt => "updated_at",
+            Self::FileSize => "file_size",
+            Self::FileKey => "file_key",
+        }
+    }
+}
+
+#[derive(Debug, Default, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SortOrderKind {
+    Asc,
+    #[default]
+    Desc,
+}
+
+impl SortOrderKind {
+    pub fn as_sql_direction(&self) -> &'static str {
+        match self {
+            Self::Asc => "ASC",
+            Self::Desc => "DESC",
+        }
+    }
+}

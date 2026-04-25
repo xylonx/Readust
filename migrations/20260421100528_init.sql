@@ -10,6 +10,8 @@ CREATE TABLE public.users (
     CONSTRAINT users_pkey PRIMARY KEY (id)
 );
 
+CREATE UNIQUE INDEX idx_users_email ON public.users (email);
+
 CREATE TABLE public.tokens (
     id UUID NOT NULL,
     user_id UUID NOT NULL,
@@ -22,6 +24,7 @@ CREATE TABLE public.tokens (
 );
 
 CREATE INDEX idx_tokens_user_id ON public.tokens (user_id);
+CREATE UNIQUE INDEX idx_tokens_refresh_token ON public.tokens (refresh_token);
 
 CREATE TABLE public.books (
     user_id UUID NOT NULL,
@@ -45,6 +48,8 @@ CREATE TABLE public.books (
     CONSTRAINT books_pkey PRIMARY KEY (user_id, book_hash)
 );
 
+CREATE INDEX idx_books_user_id_meta_hash ON public.books (user_id, meta_hash);
+
 CREATE TABLE public.book_configs (
     user_id UUID NOT NULL,
     book_hash TEXT NOT NULL,
@@ -60,6 +65,8 @@ CREATE TABLE public.book_configs (
     deleted_at TIMESTAMP WITH TIME ZONE NULL,
     CONSTRAINT book_configs_pkey PRIMARY KEY (user_id, book_hash)
 );
+
+CREATE INDEX idx_book_configs_user_id_meta_hash ON public.book_configs (user_id, meta_hash);
 
 CREATE TABLE public.book_notes (
     user_id UUID NOT NULL,
@@ -81,6 +88,8 @@ CREATE TABLE public.book_notes (
     CONSTRAINT book_notes_pkey PRIMARY KEY (user_id, book_hash, id)
 );
 
+CREATE INDEX idx_book_notes_user_id_meta_hash ON public.book_notes (user_id, meta_hash);
+
 CREATE TABLE public.files (
     id UUID NOT NULL DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
@@ -93,6 +102,5 @@ CREATE TABLE public.files (
     CONSTRAINT files_pkey PRIMARY KEY (id)
 );
 
-CREATE UNIQUE INDEX idx_files_file_key ON public.files (file_key);
-CREATE INDEX idx_files_user_id_deleted_at ON public.files (user_id, deleted_at);
-CREATE INDEX idx_files_file_key_deleted_at ON public.files (file_key, deleted_at);
+CREATE INDEX idx_files_file_key ON public.files (file_key);
+CREATE INDEX idx_files_valid_user_id_book_hash ON public.files (user_id, book_hash) WHERE deleted_at IS NULL;

@@ -26,15 +26,15 @@ pub struct Claims {
 pub struct JwtClient {
     secret: Vec<u8>,
     algorithm: Algorithm,
-    token_expire: chrono::Duration,
+    token_expires_in: chrono::Duration,
 }
 
 impl JwtClient {
-    pub fn new(secret: &str, algorithm: Algorithm, token_expire: chrono::Duration) -> Self {
+    pub fn new(secret: &str, algorithm: Algorithm, token_expires_in: chrono::Duration) -> Self {
         Self {
             secret: secret.as_bytes().to_owned(),
             algorithm,
-            token_expire,
+            token_expires_in,
         }
     }
 
@@ -47,14 +47,14 @@ impl JwtClient {
     }
 
     pub fn expires_duration(&self) -> chrono::Duration {
-        self.token_expire
+        self.token_expires_in
     }
 
     #[instrument(skip(self))]
     pub fn generate_claims(&self, user_id: uuid::Uuid) -> Claims {
         let issued_at = chrono::Utc::now();
         let token_id = self.new_token_id();
-        let expires_at = issued_at + self.token_expire;
+        let expires_at = issued_at + self.token_expires_in;
         Claims {
             issuer: "Readust".to_string(),
             user_id,

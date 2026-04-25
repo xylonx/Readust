@@ -15,7 +15,7 @@ use tower_http::{cors::CorsLayer, timeout::TimeoutLayer, trace::TraceLayer};
 use tracing::{debug_span, info};
 use tracing_subscriber::{EnvFilter, fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
-use crate::utils::jwt::JwtClient;
+use crate::utils::{jwt::JwtClient, s3::S3Client};
 
 #[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]
@@ -28,14 +28,14 @@ struct CliArgs {
 async fn main() {
     let args = CliArgs::parse();
 
-    let mut config_builder = Config::builder().add_source(config::Environment::with_prefix("READUST"));
+    let mut config_builder =
+        Config::builder().add_source(config::Environment::with_prefix("READUST"));
     if let Some(config_file) = args.config {
         config_builder = config_builder.add_source(config::File::from(config_file));
     }
     let setting = config_builder
         .build()
-        .map(|c| c.try_deserialize::<settings::Settings>())
-        .flatten()
+        .and_then(|c| c.try_deserialize::<settings::Settings>())
         .unwrap();
 
     let file_appender =
@@ -58,20 +58,23 @@ async fn main() {
     let jwt_client = JwtClient::new(
         &setting.application.jwt_secret,
         jsonwebtoken::Algorithm::HS256,
-        chrono::Duration::seconds(setting.application.jwt_token_expires),
+        setting.application.jwt_token_expires_in,
     );
+
+    let s3_client = S3Client::new(setting.s3).await.unwrap();
 
     let state = api::state::AppState::new(
         pool,
         setting.application.anon_token,
         jwt_client,
         setting.application.disable_signup,
+        s3_client,
     );
 
     serve(
         state,
         setting.application.addr,
-        std::time::Duration::from_secs(setting.application.timeout_secs),
+        setting.application.timeout.to_std().unwrap(),
     )
     .await
 }

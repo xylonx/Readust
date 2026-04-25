@@ -2,7 +2,11 @@ use std::{ops::Deref, sync::Arc};
 
 use axum::{Extension, extract::FromRequestParts};
 
-use crate::{db::schema, error::Error, utils::jwt::JwtClient};
+use crate::{
+    db::schema,
+    error::Error,
+    utils::{jwt::JwtClient, s3::S3Client},
+};
 
 #[derive(Debug, Clone)]
 pub struct AppState(Arc<AppStateInner>);
@@ -22,6 +26,8 @@ pub struct AppStateInner {
     pub jwt_client: JwtClient,
     pub anon_token: String,
     pub disable_signup: bool,
+
+    pub s3_client: S3Client,
 }
 
 impl AppState {
@@ -30,12 +36,14 @@ impl AppState {
         anon_token: String,
         jwt_client: JwtClient,
         disable_signup: bool,
+        s3_client: S3Client,
     ) -> Self {
         Self(Arc::new(AppStateInner {
             pool,
             anon_token,
             jwt_client,
             disable_signup,
+            s3_client,
         }))
     }
 }

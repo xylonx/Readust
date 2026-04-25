@@ -1,6 +1,7 @@
 mod auth;
 mod response;
 pub mod state;
+mod storage;
 mod sync;
 mod validator;
 
@@ -11,6 +12,7 @@ pub fn router() -> Router {
         "/api",
         Router::new()
             .merge(sync::router())
+            .merge(storage::router())
             .route_layer(middleware::from_fn(auth::auth_middleware)),
     )
 }

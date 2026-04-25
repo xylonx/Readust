@@ -20,7 +20,7 @@ use crate::{
         state::{AppState, AuthState, AuthStateExtractor, StateExtractor},
         validator::ValidatedJson,
     },
-    db::{self, schema},
+    db,
     error::Error,
     utils::serdefmt::duration_ms,
 };
@@ -105,7 +105,7 @@ struct SignupPayload {
 async fn signup(
     StateExtractor { state }: StateExtractor,
     ValidatedJson(data): ValidatedJson<SignupPayload>,
-) -> ApiResult<Json<schema::User>> {
+) -> ApiResult<Json<db::schema::User>> {
     if state.disable_signup {
         return Err(Error::SignupDisabled);
     }
@@ -160,7 +160,7 @@ struct AccessTokenResponse {
     #[serde(with = "chrono::serde::ts_seconds")]
     expires_at: chrono::DateTime<chrono::Utc>,
     refresh_token: uuid::Uuid,
-    user: schema::User,
+    user: db::schema::User,
 }
 
 #[derive(Debug, FromRequestParts)]
@@ -237,7 +237,7 @@ async fn token(
     }
 }
 
-async fn generate_token(state: AppState, user: schema::User) -> ApiResult<AccessTokenResponse> {
+async fn generate_token(state: AppState, user: db::schema::User) -> ApiResult<AccessTokenResponse> {
     let claims = state.jwt_client.generate_claims(user.id);
     let jwt_token = state.jwt_client.generate_jwt_token(&claims)?;
     let refresh_token = state.jwt_client.new_refresh_token();
@@ -255,7 +255,7 @@ async fn generate_token(state: AppState, user: schema::User) -> ApiResult<Access
         token_type: AccessTokenKind::Bearer,
         expires_in: state.jwt_client.expires_duration(),
         expires_at: claims.expires_at,
-        refresh_token: refresh_token,
+        refresh_token,
         user,
     })
 }
@@ -296,6 +296,6 @@ async fn logout(
 
 async fn get_user(
     AuthStateExtractor { state: _, auth }: AuthStateExtractor,
-) -> ApiResult<Json<schema::User>> {
+) -> ApiResult<Json<db::schema::User>> {
     Ok(Json(auth.user))
 }

@@ -16,7 +16,7 @@ pub enum Error {
     Json(#[from] axum::extract::rejection::JsonRejection),
 
     #[error("Invalid JWT Token: {0}")]
-    JWT(#[from] jsonwebtoken::errors::Error),
+    Jwt(#[from] jsonwebtoken::errors::Error),
 
     #[error("Authentication failed: {0}")]
     Unauthorized(String),
@@ -47,4 +47,16 @@ pub enum Error {
 
     #[error("Temp upload is not supported")]
     TempUploadUnsupported,
+
+    #[error("Path contains unsupported characters")]
+    MaliciousPathComponent,
+
+    #[error("Failed to presign a s3 PutObject url: {0}")]
+    S3PresignConfig(#[from] aws_sdk_s3::presigning::PresigningConfigError),
+
+    #[error("Failed to presign a s3 PutObject url: {0}")]
+    S3Sdk(Box<aws_sdk_s3::Error>),
+
+    #[error("File not found")]
+    FileNotFound,
 }
