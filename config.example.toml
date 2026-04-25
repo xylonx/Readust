@@ -1,0 +1,90 @@
+[application]
+# Address and port the service binds to.
+#
+# Use "0.0.0.0" to listen on all network interfaces.
+# Use "127.0.0.1" to listen only on localhost.
+#
+# Example:
+# addr = "0.0.0.0:6080"
+addr = "0.0.0.0:6080"
+
+# HTTP server request timeout, in seconds.
+#
+# Requests that take longer than this value may be terminated.
+# Increase this if the service handles long-running requests.
+timeout_secs = 120
+
+# Directory where application logs are stored.
+#
+# If this directory does not exist, the application will create it automatically.
+# The service process must have permission to create this directory and write
+# log files inside it.
+log_dir = "./logs/"
+
+# Base log file name inside `log_dir`.
+#
+# The application uses daily log rotation. The final rotated log filename is built as:
+#   {log_dir}/{log_file}.{YYYY-MM-DD}
+log_file = "app.log"
+
+# Disable user signup.
+#
+# Set to true to prevent new users from registering.
+# Existing users can still log in.
+#
+# Recommended for private deployments:
+# disable_signup = true
+disable_signup = false
+
+# JWT secret used to sign authentication tokens.
+#
+# IMPORTANT:
+# Replace this value before running in production.
+# Never commit your real JWT secret to version control.
+#
+# You can generate a secure secret with:
+#
+#   openssl rand -hex 32
+#
+# Example:
+# jwt_secret = "4f8d7c..."
+jwt_secret = "YOU_MUST_REPLACE_IT_TO_YOUR_ACTUAL_SECRET"
+
+# JWT token expiration time, in seconds.
+#
+# The default value below is 3600 seconds, or 1 hour.
+#
+# After this time, users will need to refresh or obtain a new token.
+jwt_token_expires = 3600
+
+# Magic anonymous token used by Readest.
+#
+# Readest uses this token as an API key and Authorization Bearer header
+# when refreshing access tokens.
+anon_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZic3l4ZnVzampxZHhranFseXNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxMjM2NzEsImV4cCI6MjA0OTY5OTY3MX0.3U5Uqaou_1SgrVe1eo9rApc0uKjqhpQdUXhvwUHmUfg"
+
+
+[database]
+# PostgreSQL database connection URI.
+#
+# Replace the placeholders with your actual database credentials.
+#
+# Format:
+#
+#   postgres://${user}:${password}@${host}:${port}/${database}
+#
+# Example:
+#
+#   postgres://readest:secret-password@localhost:5432/readest
+#
+# Placeholder meanings:
+#
+#   ${user}      PostgreSQL username
+#   ${password}  PostgreSQL password
+#   ${host}      PostgreSQL host, for example localhost or db
+#   ${port}      PostgreSQL port, usually 5432
+#   ${database}  PostgreSQL database name
+#
+# IMPORTANT:
+# Do not commit production database credentials to version control.
+uri = "postgres://${user}:${password}@${host}:${port}/${database}"
