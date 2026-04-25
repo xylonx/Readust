@@ -12,7 +12,7 @@ addr = "0.0.0.0:6080"
 #
 # Requests that take longer than this value may be terminated.
 # Increase this if the service handles long-running requests.
-timeout_secs = 120
+timeout = 120
 
 # Directory where application logs are stored.
 #
@@ -88,3 +88,60 @@ anon_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 # IMPORTANT:
 # Do not commit production database credentials to version control.
 uri = "postgres://${user}:${password}@${host}:${port}/${database}"
+
+
+[s3]
+# S3-compatible storage endpoint.
+#
+# Leave empty when using AWS S3 with the default regional endpoint.
+# Set this for S3-compatible providers such as MinIO, Cloudflare R2,
+# Backblaze B2, or other object storage services.
+#
+# Examples:
+#
+#   endpoint = "https://s3.amazonaws.com"
+#   endpoint = "https://<account-id>.r2.cloudflarestorage.com"
+#   endpoint = "http://localhost:9000"
+endpoint = ""
+
+# Access key ID for the S3-compatible storage account.
+#
+# Keep this value secret in production.
+access_key_id = ""
+
+# Secret access key for the S3-compatible storage account.
+#
+# Keep this value secret in production.
+# Do not commit production credentials to version control.
+secret_access_key = ""
+
+# Storage region.
+#
+# For AWS S3, use the bucket region, for example:
+#
+#   region = "us-east-1"
+#
+# For some S3-compatible providers, this may be a fixed value
+# or may be ignored by the provider.
+region = ""
+
+# Bucket name used to store uploaded objects.
+#
+# The bucket must already exist unless your application creates it elsewhere.
+bucket = ""
+
+# Expiration time for presigned upload URLs, in seconds.
+#
+# The default is 1800 seconds, or 30 minutes.
+# Uncomment and change this value if clients need more or less time
+# to upload files.
+#
+# presign_upload_expires_in = 1800
+
+# Expiration time for presigned download URLs, in seconds.
+#
+# The default is 1800 seconds, or 30 minutes.
+# Uncomment and change this value if clients need more or less time
+# to download files.
+#
+# presign_download_expires_in = 1800
