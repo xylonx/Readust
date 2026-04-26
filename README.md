@@ -1,5 +1,7 @@
 # Readust
 
+[![Docker](https://github.com/xylonx/Readust/actions/workflows/docker.yml/badge.svg)](https://github.com/xylonx/Readust/actions/workflows/docker.yml)
+
 Readust is a lightweight backend for [Readest](https://readest.com/) compatible clients. It replaces the original, larger backend stack with a small Rust service that provides Readest compatible APIs.
 
 The service is built with Axum, PostgreSQL, SQLx, JWT authentication, and S3-compatible object storage. It is intended for private or self-hosted deployments where you want the Readest client experience without operating the full upstream backend.
