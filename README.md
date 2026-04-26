@@ -1,6 +1,6 @@
-# readust
+# Readust
 
-readust is a lightweight backend for [Readest](https://readest.com/) compatible clients. It replaces the original, larger backend stack with a small Rust service that provides Readest compatible APIs.
+Readust is a lightweight backend for [Readest](https://readest.com/) compatible clients. It replaces the original, larger backend stack with a small Rust service that provides Readest compatible APIs.
 
 The service is built with Axum, PostgreSQL, SQLx, JWT authentication, and S3-compatible object storage. It is intended for private or self-hosted deployments where you want the Readest client experience without operating the full upstream backend.
 
@@ -24,7 +24,7 @@ The service is built with Axum, PostgreSQL, SQLx, JWT authentication, and S3-com
 
 ## Configuration
 
-readust loads configuration from environment variables prefixed with `READUST` and from an optional TOML configuration file passed with `--config`.
+Readust loads configuration from environment variables prefixed with `READUST` and from an optional TOML configuration file passed with `--config`.
 
 The easiest way to start is to copy the example file and edit it:
 
