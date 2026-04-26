@@ -4,28 +4,43 @@
 # Use "0.0.0.0" to listen on all network interfaces.
 # Use "127.0.0.1" to listen only on localhost.
 #
-# Example:
-# addr = "0.0.0.0:6080"
-addr = "0.0.0.0:6080"
+# Default:
+# addr = "0.0.0.0:8000"
 
 # HTTP server request timeout, in seconds.
 #
 # Requests that take longer than this value may be terminated.
 # Increase this if the service handles long-running requests.
-timeout = 120
+#
+# Default:
+# timeout = 120
 
 # Directory where application logs are stored.
 #
 # If this directory does not exist, the application will create it automatically.
 # The service process must have permission to create this directory and write
 # log files inside it.
-log_dir = "./logs/"
+#
+# Default:
+# log_dir = "./logs/"
+
+# Maximum number of rotated log files to keep.
+#
+# When the number of rotated log files exceeds this value, the oldest
+# log files are removed.
+#
+# Set this based on how many days of logs you want to retain.
+#
+# Default:
+# log_max_files = 14
 
 # Base log file name inside `log_dir`.
 #
 # The application uses daily log rotation. The final rotated log filename is built as:
 #   {log_dir}/{log_file}.{YYYY-MM-DD}
-log_file = "app.log"
+#
+# Default:
+# log_file = "app.log"
 
 # Disable user signup.
 #
@@ -34,7 +49,9 @@ log_file = "app.log"
 #
 # Recommended for private deployments:
 # disable_signup = true
-disable_signup = false
+#
+# Default:
+# disable_signup = false
 
 # JWT secret used to sign authentication tokens.
 #
@@ -55,7 +72,9 @@ jwt_secret = "YOU_MUST_REPLACE_IT_TO_YOUR_ACTUAL_SECRET"
 # The default value below is 3600 seconds, or 1 hour.
 #
 # After this time, users will need to refresh or obtain a new token.
-jwt_token_expires = 3600
+#
+# Default:
+# jwt_token_expires = 3600
 
 # Magic anonymous token used by Readest.
 #
@@ -136,6 +155,7 @@ bucket = ""
 # Uncomment and change this value if clients need more or less time
 # to upload files.
 #
+# Default:
 # presign_upload_expires_in = 1800
 
 # Expiration time for presigned download URLs, in seconds.
@@ -144,4 +164,5 @@ bucket = ""
 # Uncomment and change this value if clients need more or less time
 # to download files.
 #
+# Default:
 # presign_download_expires_in = 1800

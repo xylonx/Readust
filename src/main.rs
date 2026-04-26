@@ -38,8 +38,13 @@ async fn main() {
         .and_then(|c| c.try_deserialize::<settings::Settings>())
         .unwrap();
 
-    let file_appender =
-        tracing_appender::rolling::daily(setting.application.log_dir, setting.application.log_file);
+    let file_appender = tracing_appender::rolling::RollingFileAppender::builder()
+        .rotation(tracing_appender::rolling::Rotation::DAILY)
+        .max_log_files(setting.application.log_max_files)
+        .filename_prefix(setting.application.log_file.to_str().unwrap())
+        .build(setting.application.log_dir.to_str().unwrap())
+        .unwrap();
+
     let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
 
     let console = fmt::Layer::new().with_writer(std::io::stdout).pretty();
