@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT COUNT(*) AS \"total_count!\"\n        FROM files\n        WHERE\n            user_id = $1\n            AND deleted_at IS NULL\n            AND ($2::text IS NULL OR book_hash = $2)\n            AND ($3::text IS NULL OR file_key ILIKE '%' || $3 || '%')",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "total_count!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "ca81646af544c4fc7561a8f0dca926c40b9d335a7141e341c00224c214d9a469"
+}

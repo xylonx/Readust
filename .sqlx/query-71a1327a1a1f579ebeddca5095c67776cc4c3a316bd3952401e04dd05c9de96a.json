@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            COALESCE(SUM(file_size), 0)::BIGINT AS \"total_size!\",\n            COUNT(*)::BIGINT AS \"file_count!\"\n        FROM files\n        WHERE user_id = $1\n          AND deleted_at IS NULL\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "total_size!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "file_count!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "71a1327a1a1f579ebeddca5095c67776cc4c3a316bd3952401e04dd05c9de96a"
+}

@@ -1,0 +1,115 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT *\n        FROM book_notes\n        WHERE user_id = $1\n          AND updated_at > $2\n          AND deleted_at IS NULL\n          AND ($3::text IS NULL OR book_hash = $3)\n          AND ($4::text IS NULL OR meta_hash = $4)\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "book_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "meta_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "cfi",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "xpointer0",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "xpointer1",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "text",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "style",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "color",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "note",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "page",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 13,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 14,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 15,
+        "name": "deleted_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Timestamptz",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "537bfe86c1b1bf54e371016ef7a68b00d746248d47ea692be51ff0e6a2c1dd19"
+}

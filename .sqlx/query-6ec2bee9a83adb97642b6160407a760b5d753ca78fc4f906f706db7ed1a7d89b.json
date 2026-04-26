@@ -1,0 +1,97 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO public.book_configs ( user_id, book_hash, meta_hash, location, xpointer, progress, rsvp_position, search_config, view_settings, deleted_at )\n            VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10 )\n            ON CONFLICT (user_id, book_hash)\n            DO UPDATE SET\n              meta_hash     = EXCLUDED.meta_hash,\n              location      = EXCLUDED.location,\n              xpointer      = EXCLUDED.xpointer,\n              progress      = EXCLUDED.progress,\n              rsvp_position = EXCLUDED.rsvp_position,\n              search_config = EXCLUDED.search_config,\n              view_settings = EXCLUDED.view_settings,\n              updated_at    = NOW(),\n              deleted_at    = EXCLUDED.deleted_at\n            RETURNING *\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "book_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "meta_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "location",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "xpointer",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "progress",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 6,
+        "name": "rsvp_position",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "search_config",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 8,
+        "name": "view_settings",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 9,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 11,
+        "name": "deleted_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Jsonb",
+        "Text",
+        "Jsonb",
+        "Jsonb",
+        "Timestamptz"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "6ec2bee9a83adb97642b6160407a760b5d753ca78fc4f906f706db7ed1a7d89b"
+}

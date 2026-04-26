@@ -1,0 +1,70 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT *\n        FROM public.files\n        WHERE\n          user_id = $1\n          AND deleted_at IS NULL\n          AND ($2::text IS NULL OR book_hash = $2)\n          AND ($3::text IS NULL OR file_key ILIKE '%' || $3 || '%')\n        ORDER BY\n          CASE WHEN $6 = 'created_at' AND $7 = 'asc'  THEN created_at END ASC,\n          CASE WHEN $6 = 'created_at' AND $7 = 'desc' THEN created_at END DESC,\n \n          CASE WHEN $6 = 'updated_at' AND $7 = 'asc'  THEN updated_at END ASC,\n          CASE WHEN $6 = 'updated_at' AND $7 = 'desc' THEN updated_at END DESC,\n\n          CASE WHEN $6 = 'file_key' AND $7 = 'asc'  THEN file_key END ASC,\n          CASE WHEN $6 = 'file_key' AND $7 = 'desc' THEN file_key END DESC,\n\n          CASE WHEN $6 = 'file_size' AND $7 = 'asc'  THEN file_size END ASC,\n          CASE WHEN $6 = 'file_size' AND $7 = 'desc' THEN file_size END DESC,\n\n          id ASC\n        LIMIT $4\n        OFFSET $5\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "book_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "file_key",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "file_size",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "deleted_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Int8",
+        "Int8",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "db0651a392542bd236526a4d653127d90ffa26330350f0417fde71d42e3c8f18"
+}

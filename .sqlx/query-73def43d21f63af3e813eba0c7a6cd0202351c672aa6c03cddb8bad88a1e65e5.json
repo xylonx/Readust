@@ -1,0 +1,125 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO public.book_notes ( user_id, book_hash, meta_hash, id, type, cfi, xpointer0, xpointer1, text, style, color, note, page, deleted_at )\n            VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14 )\n            ON CONFLICT (user_id, book_hash, id)\n            DO UPDATE SET\n              meta_hash  = EXCLUDED.meta_hash,\n              type       = EXCLUDED.type,\n              cfi        = EXCLUDED.cfi,\n              xpointer0  = EXCLUDED.xpointer0,\n              xpointer1  = EXCLUDED.xpointer1,\n              text       = EXCLUDED.text,\n              style      = EXCLUDED.style,\n              color      = EXCLUDED.color,\n              note       = EXCLUDED.note,\n              page       = EXCLUDED.page,\n              updated_at = now(),\n              deleted_at = EXCLUDED.deleted_at\n            RETURNING *\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "book_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "meta_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "cfi",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "xpointer0",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "xpointer1",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "text",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "style",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "color",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "note",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "page",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 13,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 14,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 15,
+        "name": "deleted_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Int4",
+        "Timestamptz"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "73def43d21f63af3e813eba0c7a6cd0202351c672aa6c03cddb8bad88a1e65e5"
+}
