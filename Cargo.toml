@@ -2,6 +2,8 @@
 name = "readust"
 version = "0.1.0"
 edition = "2024"
+description = "A lightweight Readest-compatible backend"
+readme = "README.md"
 
 [dependencies]
 aws-config = { version = "1.8.16", features = ["behavior-version-latest"] }
