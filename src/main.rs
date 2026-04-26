@@ -29,7 +29,7 @@ async fn main() {
     let args = CliArgs::parse();
 
     let mut config_builder =
-        Config::builder().add_source(config::Environment::with_prefix("READUST"));
+        Config::builder().add_source(config::Environment::with_prefix("READUST").separator("__"));
     if let Some(config_file) = args.config {
         config_builder = config_builder.add_source(config::File::from(config_file));
     }
