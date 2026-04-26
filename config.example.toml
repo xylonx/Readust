@@ -74,7 +74,7 @@ jwt_secret = "YOU_MUST_REPLACE_IT_TO_YOUR_ACTUAL_SECRET"
 # After this time, users will need to refresh or obtain a new token.
 #
 # Default:
-# jwt_token_expires = 3600
+# jwt_token_expires_in = 3600
 
 # Magic anonymous token used by Readest.
 #
