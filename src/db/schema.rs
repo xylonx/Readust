@@ -55,6 +55,7 @@ pub struct Book {
     pub updated_at: DateTime<Utc>,
     #[serde(with = "option_timestamp_mix_ts_str")]
     pub deleted_at: Option<DateTime<Utc>>,
+    #[serde(with = "option_timestamp_mix_ts_str")]
     pub uploaded_at: Option<DateTime<Utc>>,
     pub progress: Option<Vec<i32>>,
     pub reading_status: Option<String>,
@@ -85,6 +86,7 @@ pub struct BookConfig {
     pub created_at: DateTime<Utc>,
     #[serde(with = "timestamp_mix_ts_str", default)]
     pub updated_at: DateTime<Utc>,
+    #[serde(with = "option_timestamp_mix_ts_str", default)]
     pub deleted_at: Option<DateTime<Utc>>,
 }
 
@@ -110,6 +112,7 @@ pub struct BookNote {
     pub created_at: DateTime<Utc>,
     #[serde(with = "timestamp_mix_ts_str", default)]
     pub updated_at: DateTime<Utc>,
+    #[serde(with = "option_timestamp_mix_ts_str", default)]
     pub deleted_at: Option<DateTime<Utc>>,
 }
 
@@ -127,6 +130,7 @@ pub struct File {
     pub created_at: Option<DateTime<Utc>>,
     #[serde(with = "option_timestamp_mix_ts_str", default)]
     pub updated_at: Option<DateTime<Utc>>,
+    #[serde(with = "option_timestamp_mix_ts_str", default)]
     pub deleted_at: Option<DateTime<Utc>>,
 }
 
