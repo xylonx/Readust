@@ -219,9 +219,9 @@ async fn purge(
         return Err(Error::FileNotFound);
     }
     if files.len() != file_str_keys.len() {
-        return Err(Error::Unauthorized(format!(
-            "Unauthorized access to one or more files"
-        )));
+        return Err(Error::Unauthorized(
+            "Unauthorized access to one or more files".to_string(),
+        ));
     }
 
     let results = futures_util::future::join_all(files.into_iter().map(|file| {
@@ -415,12 +415,12 @@ async fn generate_download_url_map(
 
     let missing_file_key_map = file_keys
         .into_iter()
-        .filter(|file_key| db_file_map.get(file_key).is_none() && file_key.contains("Readest/Book"))
+        .filter(|file_key| !db_file_map.contains_key(file_key) && file_key.contains("Readest/Book"))
         .filter_map(|file_key| {
             let file_key1 = file_key.clone();
             let mut splits = file_key1.split("/");
             let book_hash = splits.nth(3); // The 4-th element
-            let filename = splits.nth(0); // The 5-th element
+            let filename = splits.next(); // The 5-th element
 
             // It contains exactly 5 parts. Valid format
             if let Some(book_hash) = book_hash
@@ -449,7 +449,7 @@ async fn generate_download_url_map(
     let fallback_file_map = db::file::get_files_by_book_hashes(&state.pool, user_id, &hashes)
         .await
         .into_iter()
-        .map(|files| {
+        .flat_map(|files| {
             files.into_iter().filter_map(|file| {
                 if let Some(hash) = &file.book_hash
                     && let Some((original_file_key, ext)) = missing_file_key_map.get(hash)
@@ -460,15 +460,11 @@ async fn generate_download_url_map(
                     None
                 }
             })
-        })
-        .flatten();
+        });
 
-    let result = futures_util::future::join_all(
-        db_file_map
-            .into_iter()
-            .map(|(f, _)| f)
-            .chain(fallback_file_map)
-            .map(|file_key| {
+    let result =
+        futures_util::future::join_all(db_file_map.into_keys().chain(fallback_file_map).map(
+            |file_key| {
                 let state1 = state.clone();
                 async move {
                     match state1.s3_client.presign_download_url(&file_key).await {
@@ -479,9 +475,9 @@ async fn generate_download_url_map(
                         }
                     }
                 }
-            }),
-    )
-    .await;
+            },
+        ))
+        .await;
 
     Ok(result.into_iter().flatten().collect())
 }
