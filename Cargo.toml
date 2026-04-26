@@ -5,6 +5,12 @@ edition = "2024"
 description = "A lightweight Readest-compatible backend"
 readme = "README.md"
 
+[profile.release]
+panic = "abort"
+lto = true
+codegen-units = 1
+strip = true
+
 [dependencies]
 aws-config = { version = "1.8.16", features = ["behavior-version-latest"] }
 aws-sdk-s3 = "1.131.0"
