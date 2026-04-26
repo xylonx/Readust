@@ -1,0 +1,28 @@
+services:
+  readust:
+    image: ghcr.io/xylonx/readust:latest
+    environment:
+      - RUST_LOG=${RUST_LOG:-info}
+      - READUST__APPLICATION__JWT_SECRET=
+      - READUST__APPLICATION__ANON_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZic3l4ZnVzampxZHhranFseXNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxMjM2NzEsImV4cCI6MjA0OTY5OTY3MX0.3U5Uqaou_1SgrVe1eo9rApc0uKjqhpQdUXhvwUHmUfg
+      - READUST__DATABASE__URI=postgres://postgres:password@postgres:5432/readust
+      - READUST__S3__ENDPOINT=
+      - READUST__S3__ACCESS_KEY_ID=
+      - READUST__S3__SECRET_ACCESS_KEY=
+      - READUST__S3__REGION=
+      - READUST__S3__BUCKET=
+    ports:
+      - 8000:8000
+    volumes:
+      - ./data/logs:/app/logs
+
+  postgres:
+    image: postgres:18.2-alpine
+    hostname: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD:
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data/psql:/var/lib/postgresql

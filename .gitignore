@@ -7,3 +7,6 @@ logs/
 
 config*.toml
 !config.example.toml
+
+docker-compose*.yml
+!docker-compose.example.yml
