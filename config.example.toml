@@ -166,3 +166,25 @@ bucket = ""
 #
 # Default:
 # presign_download_expires_in = 1800
+
+[metrics]
+# Address and port the Prometheus metrics server binds to.
+#
+# Use "0.0.0.0" to listen on all network interfaces.
+# Use "127.0.0.1" to expose metrics only on localhost.
+#
+# Prometheus can scrape metrics from this endpoint.
+#
+# Default:
+# addr = "0.0.0.0:8080"
+
+# Metrics upkeep interval, in seconds.
+#
+# The application refreshes or maintains internal metrics state
+# at this interval.
+#
+# Lower values update metrics more frequently but may add overhead.
+# Higher values reduce overhead but may make metrics less fresh.
+#
+# Default:
+# upkeep_duration = 10

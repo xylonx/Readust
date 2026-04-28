@@ -9,13 +9,17 @@ use std::path::PathBuf;
 use axum::{Extension, extract::Request};
 use clap::Parser;
 use config::Config;
+use metrics_tracing_context::{MetricsLayer, TracingContextLayer};
+use metrics_util::layers::Layer;
 use tokio::signal;
 use tower::ServiceBuilder;
 use tower_http::{cors::CorsLayer, timeout::TimeoutLayer, trace::TraceLayer};
-use tracing::{debug_span, info};
+use tracing::{debug_span, error, info};
 use tracing_subscriber::{EnvFilter, fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
-use crate::utils::{jwt::JwtClient, s3::S3Client};
+use crate::utils::{
+    jwt::JwtClient, readust_metrics::setup_prometheus_metrics_recorder, s3::S3Client,
+};
 
 #[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]
@@ -53,6 +57,7 @@ async fn main() {
     tracing_subscriber::registry()
         .with(console)
         .with(inspector)
+        .with(MetricsLayer::new())
         .with(EnvFilter::from_default_env())
         .init();
 
@@ -76,15 +81,36 @@ async fn main() {
         s3_client,
     );
 
-    serve(
+    let api = serve(
         state,
         setting.application.addr,
         setting.application.timeout.to_std().unwrap(),
-    )
-    .await
+    );
+
+    let prometheus = serve_prometheus(
+        setting.metrics.addr,
+        setting.metrics.upkeep_duration.to_std().unwrap(),
+    );
+
+    tokio::select! {
+        result = api => {
+            if let Err(e) = result {
+                error!(%e, "API server stopped");
+            }
+        },
+        result = prometheus => {
+            if let Err(e) = result {
+                error!(%e, "Prometheus server stopped");
+            }
+        }
+    }
 }
 
-pub async fn serve(state: api::state::AppState, addr: String, timeout: std::time::Duration) {
+async fn serve(
+    state: api::state::AppState,
+    addr: String,
+    timeout: std::time::Duration,
+) -> Result<(), std::io::Error> {
     let api_router = api::router();
 
     let app = api_router.layer(
@@ -95,8 +121,10 @@ pub async fn serve(state: api::state::AppState, addr: String, timeout: std::time
                     "request",
                     method = %req.method(),
                     uri = %req.uri(),
+                    path = req.uri().path(),
                     version = ?req.version(),
                     trace_id = %uuid::Uuid::new_v4(),
+                    user_id = tracing::field::Empty,
                 )
             }))
             .layer(TimeoutLayer::with_status_code(
@@ -111,7 +139,37 @@ pub async fn serve(state: api::state::AppState, addr: String, timeout: std::time
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
         .await
-        .unwrap();
+}
+
+async fn serve_prometheus(
+    addr: String,
+    upkeep_duration: std::time::Duration,
+) -> Result<(), std::io::Error> {
+    let recorder = setup_prometheus_metrics_recorder().unwrap();
+    let handle = recorder.handle();
+
+    let recorder = TracingContextLayer::all().layer(recorder);
+
+    metrics::set_global_recorder(recorder).unwrap();
+
+    let upkeep_handle = handle.clone();
+    tokio::spawn(async move {
+        loop {
+            tokio::time::sleep(upkeep_duration).await;
+            upkeep_handle.run_upkeep();
+        }
+    });
+
+    let router = axum::Router::new().route(
+        "/metrics",
+        axum::routing::get(move || std::future::ready(handle.render())),
+    );
+
+    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    info!("prometheus listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, router)
+        .with_graceful_shutdown(shutdown_signal())
+        .await
 }
 
 async fn shutdown_signal() {

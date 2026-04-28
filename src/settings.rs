@@ -6,6 +6,8 @@ use crate::utils::{s3::S3Settings, serdefmt::duration_seconds};
 pub struct Settings {
     pub application: ApplicationSettings,
 
+    pub metrics: MetricsSettings,
+
     pub database: DBSettings,
 
     pub s3: S3Settings,
@@ -58,6 +60,23 @@ fn default_log_file() -> std::path::PathBuf {
 
 fn default_log_max_files() -> usize {
     14
+}
+
+#[derive(Debug, serde::Deserialize)]
+pub struct MetricsSettings {
+    #[serde(default = "default_metrics_addr")]
+    pub addr: String,
+
+    #[serde(default = "default_upkeep_duration")]
+    pub upkeep_duration: chrono::Duration,
+}
+
+fn default_metrics_addr() -> String {
+    "0.0.0.0:8080".to_string()
+}
+
+fn default_upkeep_duration() -> chrono::Duration {
+    chrono::Duration::seconds(10)
 }
 
 #[derive(Debug, serde::Deserialize)]

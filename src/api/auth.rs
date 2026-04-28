@@ -72,6 +72,7 @@ async fn extract_anon_auth_state(req: &mut Request) -> ApiResult<()> {
 pub async fn auth_middleware(mut req: Request, next: Next) -> ApiResult<Response> {
     let auth_state = extract_auth_state(&mut req).await?;
     info!("Insert auth state extension");
+    tracing::Span::current().record("user_id", tracing::field::display(&auth_state.user.id));
     req.extensions_mut().insert(auth_state);
     Ok(next.run(req).await)
 }
