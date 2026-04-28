@@ -75,6 +75,7 @@ struct ListFilesExtractor {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 struct ListFilesResponse {
     files: Vec<db::schema::File>,
     total: u64,
