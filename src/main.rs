@@ -88,7 +88,9 @@ async fn main() {
         setting.application.timeout.to_std().unwrap(),
     );
 
-    let prometheus = if let Some(metrics) = &setting.metrics {
+    let prometheus = if let Some(metrics) = &setting.metrics
+        && metrics.enabled
+    {
         future::Either::Left(serve_prometheus(
             metrics.addr.to_string(),
             metrics.upkeep_duration.to_std().unwrap(),
