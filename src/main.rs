@@ -9,6 +9,7 @@ use std::path::PathBuf;
 use axum::{Extension, extract::Request};
 use clap::Parser;
 use config::Config;
+use futures_util::future;
 use metrics_tracing_context::{MetricsLayer, TracingContextLayer};
 use metrics_util::layers::Layer;
 use tokio::signal;
@@ -87,10 +88,14 @@ async fn main() {
         setting.application.timeout.to_std().unwrap(),
     );
 
-    let prometheus = serve_prometheus(
-        setting.metrics.addr,
-        setting.metrics.upkeep_duration.to_std().unwrap(),
-    );
+    let prometheus = if let Some(metrics) = &setting.metrics {
+        future::Either::Left(serve_prometheus(
+            metrics.addr.to_string(),
+            metrics.upkeep_duration.to_std().unwrap(),
+        ))
+    } else {
+        future::Either::Right(future::pending())
+    };
 
     tokio::select! {
         result = api => {

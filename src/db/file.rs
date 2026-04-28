@@ -122,6 +122,7 @@ pub async fn get_files_by_page(
     page: i64,
     page_size: i64,
 ) -> Result<Vec<schema::File>, sqlx::Error> {
+    let offset = (page - 1) * page_size;
     sqlx::query_as!(
         schema::File,
         r#"
@@ -153,7 +154,7 @@ pub async fn get_files_by_page(
         book_hash.as_deref(),
         file_key.as_deref(),
         page_size,
-        page,
+        offset,
         sort_by.as_sql_column(),
         sort_order.as_sql_direction(),
     )
