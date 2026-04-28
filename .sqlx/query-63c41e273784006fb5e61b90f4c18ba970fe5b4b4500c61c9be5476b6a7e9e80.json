@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT *\n        FROM files\n        WHERE user_id = $1\n          AND book_hash = ( SELECT UNNEST( $2::text[] ) )\n          AND deleted_at IS NULL\n        ",
+  "query": "\n        SELECT *\n        FROM files\n        WHERE user_id = $1\n          AND book_hash IN ( SELECT UNNEST( $2::text[] ) )\n          AND deleted_at IS NULL\n        ",
   "describe": {
     "columns": [
       {
@@ -61,5 +61,5 @@
       true
     ]
   },
-  "hash": "11fc462e95d37c898fd48f51355de5e9757df3b95816a18d1d98dcfaef081385"
+  "hash": "63c41e273784006fb5e61b90f4c18ba970fe5b4b4500c61c9be5476b6a7e9e80"
 }

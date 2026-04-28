@@ -56,7 +56,7 @@ pub async fn get_files_by_book_hashes(
         SELECT *
         FROM files
         WHERE user_id = $1
-          AND book_hash = ( SELECT UNNEST( $2::text[] ) )
+          AND book_hash IN ( SELECT UNNEST( $2::text[] ) )
           AND deleted_at IS NULL
         "#,
         user_id,
