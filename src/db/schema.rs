@@ -174,8 +174,8 @@ pub enum SortOrderKind {
 impl SortOrderKind {
     pub fn as_sql_direction(&self) -> &'static str {
         match self {
-            Self::Asc => "ASC",
-            Self::Desc => "DESC",
+            Self::Asc => "asc",
+            Self::Desc => "desc",
         }
     }
 }
