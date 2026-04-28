@@ -65,7 +65,7 @@ fn default_log_max_files() -> usize {
 #[derive(Debug, serde::Deserialize)]
 pub struct MetricsSettings {
     #[serde(default)]
-    pub enable: bool,
+    pub enabled: bool,
 
     #[serde(default = "default_metrics_addr")]
     pub addr: String,
