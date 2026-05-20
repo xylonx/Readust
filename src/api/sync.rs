@@ -2,7 +2,7 @@ use axum::{
     Extension, Json, Router,
     extract::{FromRequest, Query},
     middleware,
-    routing::{get, post},
+    routing::{get},
 };
 use serde::{Deserialize, Serialize};
 use tracing::{info, instrument};
@@ -23,8 +23,7 @@ use crate::{
 
 pub fn router() -> Router {
     Router::new()
-        .route("/sync", get(pull_sync))
-        .route("/sync", post(push_sync))
+        .route("/sync", get(pull_sync).post(push_sync))
         .route_layer(middleware::from_fn(auth::auth_middleware))
 }
 
@@ -129,20 +128,23 @@ struct PushSyncExtractor {
     body: Json<SyncData>,
 }
 
-#[instrument(skip(state, auth, body))]
+#[instrument(skip(state, auth))]
 async fn push_sync(
     AuthStateExtractor { state, auth }: AuthStateExtractor,
     PushSyncExtractor { body: Json(body) }: PushSyncExtractor,
 ) -> ApiResult<Json<SyncData>> {
     let mut data = SyncData::default();
     if !body.books.is_empty() {
+        info!("push books");
         data.books = db::book::upsert_books(&state.pool, &auth.user.id, body.books).await?;
     }
     if !body.configs.is_empty() {
+        info!("push book configs");
         data.configs =
             db::config::upsert_book_configs(&state.pool, &auth.user.id, body.configs).await?;
     }
     if !body.notes.is_empty() {
+        info!("push book notes");
         data.notes = db::note::upsert_book_notes(&state.pool, &auth.user.id, body.notes).await?;
     }
     Ok(Json(data))
