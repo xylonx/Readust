@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use axum::{
     Extension, Json, RequestExt, Router,
     extract::{FromRequest, FromRequestParts, Query, Request},
@@ -39,23 +41,23 @@ async fn extract_auth_state(req: &mut Request) -> ApiResult<AuthState> {
         return Err(Error::Unauthorized("Bearer token is empty".to_string()));
     }
 
-    let claims = state.jwt_client.validate_token(token)?;
+    // First check whether it is an api token
+    let token = match uuid::Uuid::from_str(token) {
+        Ok(token_id) => db::token::get_token_by_id(&state.pool, &token_id).await?,
+        Err(e) => {
+            info!(%e, "Token is not API. Treat it as JWT token");
+            let claims = state.jwt_client.validate_token(token)?;
+            db::token::get_token_by_id(&state.pool, &claims.token_id)
+                .await
+                .map_err(|_| Error::InvalidTokenId)?
+        }
+    };
 
-    db::token::get_token_by_id(&state.pool, &claims.token_id)
-        .await
-        .map_err(|_| Error::InvalidTokenId)?;
+    let user = db::user::get_user_by_id(&state.pool, &token.user_id)
+        .await?
+        .ok_or_else(|| Error::Unauthorized(format!("User does not exist: {}", token.user_id)))?;
 
-    match db::user::get_user_by_id(&state.pool, &claims.user_id).await? {
-        Some(user) => Ok(AuthState {
-            user,
-            token_id: claims.token_id,
-        }),
-
-        None => Err(Error::Unauthorized(format!(
-            "User does not exist: {}",
-            claims.user_id
-        ))),
-    }
+    Ok(AuthState { user, token })
 }
 
 async fn extract_anon_auth_state(req: &mut Request) -> ApiResult<()> {
@@ -85,6 +87,7 @@ pub fn router() -> Router {
                 Router::new()
                     .route("/user", get(get_user))
                     .route("/logout", post(logout))
+                    .route("/token", get(get_api_token))
                     .route_layer(middleware::from_fn(auth_middleware)),
             )
             .merge(
@@ -127,6 +130,7 @@ async fn signup(
 enum TokenGrantKind {
     Password,
     RefreshToken,
+    Api,
 }
 
 #[derive(Debug, Deserialize)]
@@ -216,25 +220,44 @@ async fn token(
             let auth = extract_auth_state(&mut req).await?;
             let data = Json::<TokenRefreshToken>::from_request(req, &()).await?;
 
-            let token = db::token::get_token_by_id(&state.pool, &auth.token_id).await?;
-            if token.user_id != auth.user.id {
-                error!(%token.user_id, %auth.user.id, "UserID does not match");
-                return Err(Error::InvalidRefreshToken(format!(
-                    "Token is generated for user {} but used by {}",
-                    token.user_id, auth.user.id
-                )));
-            }
-            if token.refresh_token != data.refresh_token {
+            if auth.token.refresh_token != data.refresh_token {
                 error!(%data.refresh_token, "Invalid refresh token");
                 return Err(Error::InvalidRefreshToken(
                     "refresh token does not match".to_string(),
                 ));
             }
 
-            db::token::delete_token(&state.pool, &auth.token_id).await?;
+            db::token::delete_token(&state.pool, &auth.token.id).await?;
 
             Ok(Json(generate_token(state, auth.user).await?))
         }
+
+        TokenGrantKind::Api => {
+            // Generate an API token for api access. It must be called from a logged in user.
+
+            let auth = extract_auth_state(&mut req).await?;
+            // Currently we just set it as forever.
+            let expires_at = chrono::DateTime::<chrono::Utc>::MAX_UTC;
+            Ok(Json(
+                generate_api_token(state, auth.user, expires_at).await?,
+            ))
+        }
+    }
+}
+
+async fn get_api_token(
+    AuthStateExtractor { state, auth }: AuthStateExtractor,
+    TokenExetractor { query }: TokenExetractor,
+) -> ApiResult<Json<Vec<db::schema::Token>>> {
+    match query.grant_type {
+        TokenGrantKind::Api => {
+            let tokens = db::token::get_api_tokens(&state.pool, &auth.user.id).await?;
+            Ok(Json(tokens))
+        }
+        _ => Err(Error::Unsupported(format!(
+            "Unsupported query type for get_api_token: {:?}",
+            query
+        ))),
     }
 }
 
@@ -257,6 +280,30 @@ async fn generate_token(state: AppState, user: db::schema::User) -> ApiResult<Ac
         expires_in: state.jwt_client.expires_duration(),
         expires_at: claims.expires_at,
         refresh_token,
+        user,
+    })
+}
+
+async fn generate_api_token(
+    state: AppState,
+    user: db::schema::User,
+    expires_at: chrono::DateTime<chrono::Utc>,
+) -> ApiResult<AccessTokenResponse> {
+    let token = db::token::create_token(
+        &state.pool,
+        uuid::Uuid::new_v4(),
+        uuid::Uuid::new_v4(),
+        user.id,
+        expires_at,
+    )
+    .await?;
+    debug!(?token, "Generate API token");
+    Ok(AccessTokenResponse {
+        access_token: token.id.to_string(),
+        token_type: AccessTokenKind::Bearer,
+        expires_in: state.jwt_client.expires_duration(),
+        expires_at,
+        refresh_token: token.refresh_token,
         user,
     })
 }
@@ -290,7 +337,7 @@ async fn logout(
         LogoutScope::Global => {
             db::token::delete_token_by_user_id(&state.pool, &auth.user.id).await?
         }
-        LogoutScope::Local => db::token::delete_token(&state.pool, &auth.token_id).await?,
+        LogoutScope::Local => db::token::delete_token(&state.pool, &auth.token.id).await?,
     };
     Ok(StatusCode::NO_CONTENT)
 }

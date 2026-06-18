@@ -51,7 +51,7 @@ impl AppState {
 #[derive(Debug, Clone)]
 pub struct AuthState {
     pub user: schema::User,
-    pub token_id: uuid::Uuid,
+    pub token: schema::Token,
 }
 
 #[derive(Debug, FromRequestParts)]

@@ -42,6 +42,23 @@ pub async fn get_token_by_id(
 }
 
 #[instrument(skip(pool))]
+pub async fn get_api_tokens(
+    pool: &sqlx::PgPool,
+    user_id: &Uuid,
+) -> Result<Vec<schema::Token>, sqlx::Error> {
+    sqlx::query_as!(
+        schema::Token,
+        r#"SELECT * FROM tokens WHERE expires_at = $1 AND user_id = $2 AND deleted_at IS NULL"#,
+        // HACK(xylonx): Currently, API tokens are generated with MAX_UTC as expires.
+        // So it is a clear sign for API tokens.
+        chrono::DateTime::<chrono::Utc>::MAX_UTC,
+        user_id,
+    )
+    .fetch_all(pool)
+    .await
+}
+
+#[instrument(skip(pool))]
 pub async fn delete_token(pool: &sqlx::PgPool, token_id: &Uuid) -> Result<(), sqlx::Error> {
     sqlx::query_as!(
         schema::Token,
