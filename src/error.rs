@@ -59,4 +59,7 @@ pub enum Error {
 
     #[error("File not found")]
     FileNotFound,
+
+    #[error("Unsupported: {0}")]
+    Unsupported(String),
 }
