@@ -53,15 +53,15 @@ pub struct Book {
     pub created_at: DateTime<Utc>,
     #[serde(with = "timestamp_mix_ts_str", default)]
     pub updated_at: DateTime<Utc>,
-    #[serde(with = "option_timestamp_mix_ts_str")]
+    #[serde(with = "option_timestamp_mix_ts_str", default)]
     pub deleted_at: Option<DateTime<Utc>>,
-    #[serde(with = "option_timestamp_mix_ts_str")]
+    #[serde(with = "option_timestamp_mix_ts_str", default)]
     pub uploaded_at: Option<DateTime<Utc>>,
     pub progress: Option<Vec<i32>>,
     pub reading_status: Option<String>,
     pub group_id: Option<String>,
     pub group_name: Option<String>,
-    #[serde(with = "opt_json_obj_in_str_out")]
+    #[serde(with = "opt_json_obj_in_str_out", default)]
     pub metadata: Option<serde_json::Value>,
 }
 
@@ -75,12 +75,12 @@ pub struct BookConfig {
     pub meta_hash: Option<String>,
     pub location: Option<String>,
     pub xpointer: Option<String>,
-    #[serde(with = "opt_json_obj_in_str_out")]
+    #[serde(with = "opt_json_obj_in_str_out", default)]
     pub progress: Option<serde_json::Value>,
     pub rsvp_position: Option<String>,
-    #[serde(with = "opt_json_obj_in_str_out")]
+    #[serde(with = "opt_json_obj_in_str_out", default)]
     pub search_config: Option<serde_json::Value>,
-    #[serde(with = "opt_json_obj_in_str_out")]
+    #[serde( with = "opt_json_obj_in_str_out", default)]
     pub view_settings: Option<serde_json::Value>,
     #[serde(with = "timestamp_mix_ts_str", default)]
     pub created_at: DateTime<Utc>,
