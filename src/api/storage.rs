@@ -187,7 +187,6 @@ struct PurgeBody {
 }
 
 #[derive(Debug, FromRequest)]
-#[from_request(rejection(Error))]
 struct PurgeExtractor {
     #[from_request(via(ValidatedJson))]
     body: PurgeBody,
@@ -380,7 +379,6 @@ struct DownloadMultipleBody {
 }
 
 #[derive(Debug, FromRequest)]
-#[from_request(rejection(Error))]
 struct DownloadMultipleExtractor {
     #[from_request(via(ValidatedJson))]
     body: DownloadMultipleBody,

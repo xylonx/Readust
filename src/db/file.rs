@@ -111,6 +111,7 @@ pub async fn agg_file_count_size_by_book_hash(
     .await
 }
 
+#[allow(clippy::too_many_arguments)]
 #[instrument(skip(pool))]
 pub async fn get_files_by_page(
     pool: &sqlx::PgPool,
