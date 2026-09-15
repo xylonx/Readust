@@ -14,7 +14,6 @@ pub async fn get_books(
         FROM books
         WHERE user_id = $1
           AND updated_at > $2
-          AND deleted_at IS NULL
           AND ($3::text IS NULL OR book_hash = $3)
           AND ($4::text IS NULL OR meta_hash = $4)
         "#,
