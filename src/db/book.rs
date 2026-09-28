@@ -13,8 +13,7 @@ pub async fn get_books(
         SELECT *
         FROM books
         WHERE user_id = $1
-          AND updated_at > $2
-          AND deleted_at > $2
+          AND (updated_at > $2 OR deleted_at > $2)
           AND ($3::text IS NULL OR book_hash = $3)
           AND ($4::text IS NULL OR meta_hash = $4)
         "#,
@@ -35,11 +34,11 @@ pub async fn upsert_books(
     let mut data = Vec::new();
 
     for book in books {
-        let record = sqlx::query_as!(
+        let upserted = sqlx::query_as!(
             schema::Book,
             r#"
             INSERT INTO public.books ( user_id, book_hash, meta_hash, format, title, source_title, author, "group", tags, created_at, updated_at, deleted_at, uploaded_at, progress, reading_status, group_id, group_name, metadata )
-            VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18 )
+            VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), $12, $13, $14, $15, $16, $17, $18 )
             ON CONFLICT (user_id, book_hash)
             DO UPDATE SET
               meta_hash      = EXCLUDED.meta_hash,
@@ -49,8 +48,7 @@ pub async fn upsert_books(
               author         = EXCLUDED.author,
               "group"        = EXCLUDED."group",
               tags           = EXCLUDED.tags,
-              created_at     = EXCLUDED.created_at,
-              updated_at     = EXCLUDED.updated_at,
+              updated_at     = $11,
               deleted_at     = EXCLUDED.deleted_at,
               uploaded_at    = EXCLUDED.uploaded_at,
               progress       = EXCLUDED.progress,
@@ -58,10 +56,13 @@ pub async fn upsert_books(
               group_id       = EXCLUDED.group_id,
               group_name     = EXCLUDED.group_name,
               metadata       = EXCLUDED.metadata
+            WHERE $11 > books.updated_at
+               OR COALESCE(EXCLUDED.deleted_at, 'epoch'::timestamptz)
+                  > COALESCE(books.deleted_at, 'epoch'::timestamptz)
             RETURNING *
             "#,
             user_id,
-            book.book_hash,
+            &book.book_hash,
             book.meta_hash,
             book.format,
             book.title,
@@ -79,10 +80,28 @@ pub async fn upsert_books(
             book.group_name,
             book.metadata,
         )
-        .fetch_one(pool)
+        .fetch_optional(pool)
         .await?;
 
-        data.push(record);
+        // A rejected update returns no row; read the current server version.
+        let winner = match upserted {
+            Some(book) => book,
+            None => sqlx::query_as!(
+                schema::Book,
+                r#"
+                SELECT *
+                FROM books
+                WHERE user_id = $1
+                  AND book_hash = $2
+                "#,
+                user_id,
+                &book.book_hash,
+            )
+            .fetch_one(pool)
+            .await?,
+        };
+
+        data.push(winner);
     }
 
     Ok(data)

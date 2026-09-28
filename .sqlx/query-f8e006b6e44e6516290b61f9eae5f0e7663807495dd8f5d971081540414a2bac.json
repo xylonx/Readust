@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT *\n        FROM book_configs\n        WHERE user_id = $1\n          AND updated_at > $2\n          AND deleted_at IS NULL\n          AND ($3::text IS NULL OR book_hash = $3)\n          AND ($4::text IS NULL OR meta_hash = $4)\n        ",
+  "query": "\n            INSERT INTO public.book_configs ( user_id, book_hash, meta_hash, location, xpointer, progress, rsvp_position, search_config, view_settings, created_at, updated_at, deleted_at )\n            VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), $12 )\n            ON CONFLICT (user_id, book_hash)\n            DO UPDATE SET\n              meta_hash     = EXCLUDED.meta_hash,\n              location      = EXCLUDED.location,\n              xpointer      = EXCLUDED.xpointer,\n              progress      = EXCLUDED.progress,\n              rsvp_position = EXCLUDED.rsvp_position,\n              search_config = EXCLUDED.search_config,\n              view_settings = EXCLUDED.view_settings,\n              updated_at    = $11,\n              deleted_at    = EXCLUDED.deleted_at\n            WHERE $11 > book_configs.updated_at\n               OR COALESCE(EXCLUDED.deleted_at, 'epoch'::timestamptz)\n                  > COALESCE(book_configs.deleted_at, 'epoch'::timestamptz)\n            RETURNING *\n            ",
   "describe": {
     "columns": [
       {
@@ -67,9 +67,17 @@
     "parameters": {
       "Left": [
         "Uuid",
-        "Timestamptz",
         "Text",
-        "Text"
+        "Text",
+        "Text",
+        "Text",
+        "Jsonb",
+        "Text",
+        "Jsonb",
+        "Jsonb",
+        "Timestamptz",
+        "Timestamptz",
+        "Timestamptz"
       ]
     },
     "nullable": [
@@ -87,5 +95,5 @@
       true
     ]
   },
-  "hash": "574a1c691a1f129dc4e04a3ad22b11f5b825e513674821081f3709e3552413ba"
+  "hash": "f8e006b6e44e6516290b61f9eae5f0e7663807495dd8f5d971081540414a2bac"
 }

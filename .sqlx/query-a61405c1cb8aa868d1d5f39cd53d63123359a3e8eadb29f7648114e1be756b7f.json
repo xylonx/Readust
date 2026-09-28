@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT *\n        FROM books\n        WHERE user_id = $1\n          AND updated_at > $2\n          AND deleted_at > $2\n          AND ($3::text IS NULL OR book_hash = $3)\n          AND ($4::text IS NULL OR meta_hash = $4)\n        ",
+  "query": "\n        SELECT *\n        FROM books\n        WHERE user_id = $1\n          AND (updated_at > $2 OR deleted_at > $2)\n          AND ($3::text IS NULL OR book_hash = $3)\n          AND ($4::text IS NULL OR meta_hash = $4)\n        ",
   "describe": {
     "columns": [
       {
@@ -123,5 +123,5 @@
       true
     ]
   },
-  "hash": "28359afed0c8e0447da9bfbc6da5a52a0aae38de22ffbf04118e696554acbacd"
+  "hash": "a61405c1cb8aa868d1d5f39cd53d63123359a3e8eadb29f7648114e1be756b7f"
 }

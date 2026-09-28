@@ -49,9 +49,9 @@ pub struct Book {
     pub author: Option<String>,
     pub group: Option<String>,
     pub tags: Option<Vec<String>>,
-    #[serde(with = "timestamp_mix_ts_str", default)]
+    #[serde(with = "timestamp_mix_ts_str", default = "Utc::now")]
     pub created_at: DateTime<Utc>,
-    #[serde(with = "timestamp_mix_ts_str", default)]
+    #[serde(with = "timestamp_mix_ts_str", default = "Utc::now")]
     pub updated_at: DateTime<Utc>,
     #[serde(with = "option_timestamp_mix_ts_str", default)]
     pub deleted_at: Option<DateTime<Utc>>,
@@ -82,9 +82,9 @@ pub struct BookConfig {
     pub search_config: Option<serde_json::Value>,
     #[serde( with = "opt_json_obj_in_str_out", default)]
     pub view_settings: Option<serde_json::Value>,
-    #[serde(with = "timestamp_mix_ts_str", default)]
+    #[serde(with = "timestamp_mix_ts_str", default = "Utc::now")]
     pub created_at: DateTime<Utc>,
-    #[serde(with = "timestamp_mix_ts_str", default)]
+    #[serde(with = "timestamp_mix_ts_str", default = "Utc::now")]
     pub updated_at: DateTime<Utc>,
     #[serde(with = "option_timestamp_mix_ts_str", default)]
     pub deleted_at: Option<DateTime<Utc>>,
@@ -108,9 +108,9 @@ pub struct BookNote {
     pub color: Option<String>,
     pub note: Option<String>,
     pub page: Option<i32>,
-    #[serde(with = "timestamp_mix_ts_str", default)]
+    #[serde(with = "timestamp_mix_ts_str", default = "Utc::now")]
     pub created_at: DateTime<Utc>,
-    #[serde(with = "timestamp_mix_ts_str", default)]
+    #[serde(with = "timestamp_mix_ts_str", default = "Utc::now")]
     pub updated_at: DateTime<Utc>,
     #[serde(with = "option_timestamp_mix_ts_str", default)]
     pub deleted_at: Option<DateTime<Utc>>,

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO public.book_notes ( user_id, book_hash, meta_hash, id, type, cfi, xpointer0, xpointer1, text, style, color, note, page, deleted_at )\n            VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14 )\n            ON CONFLICT (user_id, book_hash, id)\n            DO UPDATE SET\n              meta_hash  = EXCLUDED.meta_hash,\n              type       = EXCLUDED.type,\n              cfi        = EXCLUDED.cfi,\n              xpointer0  = EXCLUDED.xpointer0,\n              xpointer1  = EXCLUDED.xpointer1,\n              text       = EXCLUDED.text,\n              style      = EXCLUDED.style,\n              color      = EXCLUDED.color,\n              note       = EXCLUDED.note,\n              page       = EXCLUDED.page,\n              updated_at = now(),\n              deleted_at = EXCLUDED.deleted_at\n            RETURNING *\n            ",
+  "query": "\n        SELECT *\n        FROM book_notes\n        WHERE user_id = $1\n          AND (updated_at > $2 OR deleted_at > $2)\n          AND ($3::text IS NULL OR book_hash = $3)\n          AND ($4::text IS NULL OR meta_hash = $4)\n        ",
   "describe": {
     "columns": [
       {
@@ -87,19 +87,9 @@
     "parameters": {
       "Left": [
         "Uuid",
+        "Timestamptz",
         "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Int4",
-        "Timestamptz"
+        "Text"
       ]
     },
     "nullable": [
@@ -121,5 +111,5 @@
       true
     ]
   },
-  "hash": "73def43d21f63af3e813eba0c7a6cd0202351c672aa6c03cddb8bad88a1e65e5"
+  "hash": "6247a51e6f43e2d65d9a279be655ea6ca1505d5ba1c8403190ee6fc18b09bdf8"
 }
