@@ -48,6 +48,7 @@ pub async fn upsert_books(
               author         = EXCLUDED.author,
               "group"        = EXCLUDED."group",
               tags           = EXCLUDED.tags,
+              created_at     = EXCLUDED.created_at,
               updated_at     = $11,
               deleted_at     = EXCLUDED.deleted_at,
               uploaded_at    = EXCLUDED.uploaded_at,
@@ -88,12 +89,7 @@ pub async fn upsert_books(
             Some(book) => book,
             None => sqlx::query_as!(
                 schema::Book,
-                r#"
-                SELECT *
-                FROM books
-                WHERE user_id = $1
-                  AND book_hash = $2
-                "#,
+                r#"SELECT * FROM books WHERE user_id = $1 AND book_hash = $2"#,
                 user_id,
                 &book.book_hash,
             )

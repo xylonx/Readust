@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO public.book_notes ( user_id, book_hash, meta_hash, id, type, cfi, xpointer0, xpointer1, text, style, color, note, page, created_at, updated_at, deleted_at )\n            VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW(), $16 )\n            ON CONFLICT (user_id, book_hash, id)\n            DO UPDATE SET\n              meta_hash  = EXCLUDED.meta_hash,\n              type       = EXCLUDED.type,\n              cfi        = EXCLUDED.cfi,\n              xpointer0  = EXCLUDED.xpointer0,\n              xpointer1  = EXCLUDED.xpointer1,\n              text       = EXCLUDED.text,\n              style      = EXCLUDED.style,\n              color      = EXCLUDED.color,\n              note       = EXCLUDED.note,\n              page       = EXCLUDED.page,\n              updated_at = $15,\n              deleted_at = EXCLUDED.deleted_at\n            WHERE $15 > book_notes.updated_at\n               OR COALESCE(EXCLUDED.deleted_at, 'epoch'::timestamptz)\n                  > COALESCE(book_notes.deleted_at, 'epoch'::timestamptz)\n            RETURNING *\n            ",
+  "query": "\n            INSERT INTO public.book_notes ( user_id, book_hash, meta_hash, id, type, cfi, xpointer0, xpointer1, text, style, color, note, page, created_at, updated_at, deleted_at )\n            VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW(), $16 )\n            ON CONFLICT (user_id, book_hash, id)\n            DO UPDATE SET\n              meta_hash  = EXCLUDED.meta_hash,\n              type       = EXCLUDED.type,\n              cfi        = EXCLUDED.cfi,\n              xpointer0  = EXCLUDED.xpointer0,\n              xpointer1  = EXCLUDED.xpointer1,\n              text       = EXCLUDED.text,\n              style      = EXCLUDED.style,\n              color      = EXCLUDED.color,\n              note       = EXCLUDED.note,\n              page       = EXCLUDED.page,\n              created_at = EXCLUDED.created_at,\n              updated_at = $15,\n              deleted_at = EXCLUDED.deleted_at\n            WHERE $15 > book_notes.updated_at\n               OR COALESCE(EXCLUDED.deleted_at, 'epoch'::timestamptz)\n                  > COALESCE(book_notes.deleted_at, 'epoch'::timestamptz)\n            RETURNING *\n            ",
   "describe": {
     "columns": [
       {
@@ -123,5 +123,5 @@
       true
     ]
   },
-  "hash": "4d3e87cda4fa2fce6be4567ab8af7491ee8470021a87e968294dcd9e0795fd67"
+  "hash": "d72f1cb6dd7675741a556a0f8bf175d8c888ba945cb370ef8f096a3b6924a662"
 }

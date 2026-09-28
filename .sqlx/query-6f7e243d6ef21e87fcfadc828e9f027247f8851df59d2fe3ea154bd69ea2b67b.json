@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                SELECT *\n                FROM books\n                WHERE user_id = $1\n                  AND book_hash = $2\n                ",
+  "query": "SELECT * FROM book_notes WHERE user_id = $1 AND book_hash = $2 AND id = $3",
   "describe": {
     "columns": [
       {
@@ -20,83 +20,74 @@
       },
       {
         "ordinal": 3,
-        "name": "format",
+        "name": "id",
         "type_info": "Text"
       },
       {
         "ordinal": 4,
-        "name": "title",
+        "name": "type",
         "type_info": "Text"
       },
       {
         "ordinal": 5,
-        "name": "source_title",
+        "name": "cfi",
         "type_info": "Text"
       },
       {
         "ordinal": 6,
-        "name": "author",
+        "name": "xpointer0",
         "type_info": "Text"
       },
       {
         "ordinal": 7,
-        "name": "group",
+        "name": "xpointer1",
         "type_info": "Text"
       },
       {
         "ordinal": 8,
-        "name": "tags",
-        "type_info": "TextArray"
+        "name": "text",
+        "type_info": "Text"
       },
       {
         "ordinal": 9,
+        "name": "style",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "color",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "note",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "page",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 13,
         "name": "created_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 10,
+        "ordinal": 14,
         "name": "updated_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 11,
+        "ordinal": 15,
         "name": "deleted_at",
         "type_info": "Timestamptz"
-      },
-      {
-        "ordinal": 12,
-        "name": "uploaded_at",
-        "type_info": "Timestamptz"
-      },
-      {
-        "ordinal": 13,
-        "name": "progress",
-        "type_info": "Int4Array"
-      },
-      {
-        "ordinal": 14,
-        "name": "reading_status",
-        "type_info": "Text"
-      },
-      {
-        "ordinal": 15,
-        "name": "group_id",
-        "type_info": "Text"
-      },
-      {
-        "ordinal": 16,
-        "name": "group_name",
-        "type_info": "Text"
-      },
-      {
-        "ordinal": 17,
-        "name": "metadata",
-        "type_info": "Json"
       }
     ],
     "parameters": {
       "Left": [
         "Uuid",
+        "Text",
         "Text"
       ]
     },
@@ -104,6 +95,10 @@
       false,
       false,
       true,
+      false,
+      true,
+      true,
+      true,
       true,
       true,
       true,
@@ -112,14 +107,8 @@
       true,
       false,
       false,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
       true
     ]
   },
-  "hash": "aac69cabc77583c5125d15b628ba55e35f5a6ab8e6e3d9db6ddb42f5db8a4094"
+  "hash": "6f7e243d6ef21e87fcfadc828e9f027247f8851df59d2fe3ea154bd69ea2b67b"
 }

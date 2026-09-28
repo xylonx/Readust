@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                SELECT *\n                FROM book_configs\n                WHERE user_id = $1\n                  AND book_hash = $2\n                ",
+  "query": "SELECT * FROM book_configs WHERE user_id = $1 AND book_hash = $2",
   "describe": {
     "columns": [
       {
@@ -85,5 +85,5 @@
       true
     ]
   },
-  "hash": "d27efb5253149218ccd3e55534b771772b37b9e8c058892871df14a5bd55f128"
+  "hash": "00474fb5a7788476449942bfc184bd5fd6c3f488db9bb3c445539d4962c8ee1e"
 }

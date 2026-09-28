@@ -51,6 +51,7 @@ pub async fn upsert_book_notes(
               color      = EXCLUDED.color,
               note       = EXCLUDED.note,
               page       = EXCLUDED.page,
+              created_at = EXCLUDED.created_at,
               updated_at = $15,
               deleted_at = EXCLUDED.deleted_at
             WHERE $15 > book_notes.updated_at
@@ -82,13 +83,7 @@ pub async fn upsert_book_notes(
             Some(note) => note,
             None => sqlx::query_as!(
                 schema::BookNote,
-                r#"
-                SELECT *
-                FROM book_notes
-                WHERE user_id = $1
-                  AND book_hash = $2
-                  AND id = $3
-                "#,
+                r#"SELECT * FROM book_notes WHERE user_id = $1 AND book_hash = $2 AND id = $3"#,
                 user_id,
                 &note.book_hash,
                 &note.id,

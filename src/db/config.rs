@@ -75,12 +75,7 @@ pub async fn upsert_book_configs(
             Some(config) => config,
             None => sqlx::query_as!(
                 schema::BookConfig,
-                r#"
-                SELECT *
-                FROM book_configs
-                WHERE user_id = $1
-                  AND book_hash = $2
-                "#,
+                r#"SELECT * FROM book_configs WHERE user_id = $1 AND book_hash = $2"#,
                 user_id,
                 &config.book_hash,
             )
