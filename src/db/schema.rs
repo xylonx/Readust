@@ -184,13 +184,25 @@ impl SortOrderKind {
 #[serde(rename_all = "snake_case")]
 #[sqlx(type_name = "text", rename_all = "snake_case")]
 pub enum ReplicaKind {
+    Bookshelf,
+    Dictionary,
     Font,
+    Texture,
+    OpdsCatalog,
+    AbsServer,
+    Settings,
 }
 
 impl ReplicaKind {
     pub fn as_str(&self) -> &str {
         match self {
+            ReplicaKind::Bookshelf => "bookshelf",
+            ReplicaKind::Dictionary => "dictionary",
             ReplicaKind::Font => "font",
+            ReplicaKind::Texture => "texture",
+            ReplicaKind::OpdsCatalog => "opds_catalog",
+            ReplicaKind::AbsServer => "abs_server",
+            ReplicaKind::Settings => "settings",
         }
     }
 }
@@ -206,6 +218,8 @@ pub struct ReplicaRow {
     pub reincarnation: Option<String>,
     pub updated_at_ts: String,
     pub schema_version: i32,
+    #[serde(skip_deserializing, default = "Utc::now")]
     pub created_at: DateTime<Utc>,
+    #[serde(skip_deserializing, default = "Utc::now")]
     pub modified_at: DateTime<Utc>,
 }

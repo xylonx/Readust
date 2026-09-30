@@ -1,0 +1,84 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            user_id,\n            kind AS \"kind: ReplicaKind\",\n            replica_id,\n            fields_jsonb,\n            manifest_jsonb,\n            deleted_at_ts,\n            reincarnation,\n            updated_at_ts,\n            schema_version,\n            created_at,\n            modified_at\n        FROM replicas\n        WHERE user_id = $1 AND kind = $2 AND ($3::text IS NULL OR updated_at_ts > $3)\n        ORDER BY updated_at_ts\n        LIMIT 1000\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "kind: ReplicaKind",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "replica_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "fields_jsonb",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 4,
+        "name": "manifest_jsonb",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 5,
+        "name": "deleted_at_ts",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "reincarnation",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "updated_at_ts",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "schema_version",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "modified_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "6a139444d413b2ca584769b9412a7ad27caefb263b9c690ca5eacdeae3890443"
+}

@@ -175,58 +175,6 @@ BEGIN
     fields_jsonb   = public.crdt_merge_fields(r.fields_jsonb, EXCLUDED.fields_jsonb),
     deleted_at_ts  = public.hlc_max(r.deleted_at_ts, EXCLUDED.deleted_at_ts),
     reincarnation  = CASE
-                       WHEN r.reincarnation IS NOT DISTINCT FROM EXCLUDED.reincarnation
-                         THEN r.reincarnation
-                       WHEN EXCLUDED.updated_at_ts > r.updated_at_ts
-                         THEN EXCLUDED.reincarnation
-                       ELSE r.reincarnation
-                     END,
-    manifest_jsonb = CASE
-                       WHEN EXCLUDED.updated_at_ts > r.updated_at_ts
-                         THEN EXCLUDED.manifest_jsonb
-                       ELSE r.manifest_jsonb
-                     END,
-    schema_version = GREATEST(r.schema_version, EXCLUDED.schema_version),
-    updated_at_ts  = public.crdt_compute_updated_at(
-                       public.crdt_merge_fields(r.fields_jsonb, EXCLUDED.fields_jsonb),
-                       public.hlc_max(r.deleted_at_ts, EXCLUDED.deleted_at_ts)
-                     ),
-    modified_at    = now()
-  RETURNING * INTO result;
-  RETURN result;
-END;
-$$;
-
-CREATE OR REPLACE FUNCTION public.crdt_merge_replica(
-  p_user_id uuid,
-  p_kind text,
-  p_replica_id text,
-  p_fields_jsonb jsonb,
-  p_manifest_jsonb jsonb,
-  p_deleted_at_ts text,
-  p_reincarnation text,
-  p_updated_at_ts text,
-  p_schema_version integer
-) RETURNS public.replicas
-LANGUAGE plpgsql
-AS $$
-DECLARE
-  result public.replicas;
-BEGIN
-  INSERT INTO public.replicas AS r (
-    user_id, kind, replica_id,
-    fields_jsonb, manifest_jsonb, deleted_at_ts,
-    reincarnation, updated_at_ts, schema_version
-  ) VALUES (
-    p_user_id, p_kind, p_replica_id,
-    COALESCE(p_fields_jsonb, '{}'::jsonb),
-    p_manifest_jsonb, p_deleted_at_ts,
-    p_reincarnation, p_updated_at_ts, p_schema_version
-  )
-  ON CONFLICT (user_id, kind, replica_id) DO UPDATE SET
-    fields_jsonb   = public.crdt_merge_fields(r.fields_jsonb, EXCLUDED.fields_jsonb),
-    deleted_at_ts  = public.hlc_max(r.deleted_at_ts, EXCLUDED.deleted_at_ts),
-    reincarnation  = CASE
                        WHEN r.reincarnation IS NULL AND EXCLUDED.reincarnation IS NULL
                          THEN NULL
                        WHEN r.reincarnation IS NOT NULL AND EXCLUDED.reincarnation IS NULL

@@ -33,7 +33,7 @@ struct ReplicasData {
 #[derive(Debug, Deserialize)]
 struct PullReplicasQuery {
     kind: ReplicaKind,
-    since: String,
+    since: Option<String>,
 }
 
 #[derive(Debug, FromRequest)]
@@ -50,7 +50,7 @@ struct PullReplicasExtractor {
 #[derive(Debug, Serialize, Deserialize)]
 struct BatchPullEntry {
     kind: ReplicaKind,
-    since: String,
+    since: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Validate)]
@@ -68,11 +68,17 @@ struct BatchPushBody {
 
 #[derive(Debug, Serialize)]
 pub struct BatchPullResponse {
+    results: Vec<BatchPullResponseEntry>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct BatchPullResponseEntry {
     kind: ReplicaKind,
     rows: Vec<ReplicaRow>,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(untagged)]
 enum BatchBody {
     Pull(BatchPullBody),
     Push(BatchPushBody),
@@ -108,18 +114,18 @@ async fn batch_pull(
     state: AppState,
     auth: AuthState,
     cursors: Vec<BatchPullEntry>,
-) -> ApiResult<Json<Vec<BatchPullResponse>>> {
-    let results = futures_util::future::try_join_all(cursors.iter().map(|cursor| {
+) -> ApiResult<Json<BatchPullResponse>> {
+    let results = futures_util::future::try_join_all(cursors.iter().map(|entry| {
         let pool = state.pool.clone();
         async move {
-            Result::<_, sqlx::Error>::Ok(BatchPullResponse {
-                kind: cursor.kind.clone(),
-                rows: get_replicas(&pool, &auth.user.id, &cursor.kind, &cursor.since).await?,
+            Result::<_, sqlx::Error>::Ok(BatchPullResponseEntry {
+                kind: entry.kind.clone(),
+                rows: get_replicas(&pool, &auth.user.id, &entry.kind, entry.since.as_ref()).await?,
             })
         }
     }))
     .await?;
-    Ok(Json(results))
+    Ok(Json(BatchPullResponse { results }))
 }
 
 async fn batch_push(state: AppState, rows: Vec<ReplicaRow>) -> ApiResult<Json<ReplicasData>> {
@@ -136,7 +142,13 @@ async fn batch_push(state: AppState, rows: Vec<ReplicaRow>) -> ApiResult<Json<Re
 async fn pull(
     PullReplicasExtractor { state, auth, query }: PullReplicasExtractor,
 ) -> ApiResult<Json<ReplicasData>> {
-    let rows = get_replicas(&state.pool, &auth.user.id, &query.kind, &query.since).await?;
+    let rows = get_replicas(
+        &state.pool,
+        &auth.user.id,
+        &query.kind,
+        query.since.as_ref(),
+    )
+    .await?;
     Ok(Json(ReplicasData { rows }))
 }
 
