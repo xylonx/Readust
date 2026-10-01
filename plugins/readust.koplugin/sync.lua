@@ -32,7 +32,7 @@ function ReadustSyncClient:init()
         method = 'GET',
         required_params = {
           'since',
-          'type',
+          'sync',
           'book',
           'meta_hash',
         },
@@ -116,7 +116,7 @@ function ReadustSyncClient:pullSync(params, callback)
     local ok, res = pcall(function()
       return self.client:pull_sync({
         since = params.since,
-        type = params.type,
+        sync = params.sync,
         book = params.book,
         meta_hash = params.meta_hash,
       })

@@ -390,7 +390,7 @@ function ReadustSync:onPageUpdate(page)
 end
 
 function ReadustSync:onAnnotationsModified()
-  if self.settings.auto_sync and self.settings.access_token then
+  if self.settings.auto_sync and self.settings.backend_url and self.settings.api_key then
     UIManager:nextTick(function()
       self:pushBookNotes(false)
     end)

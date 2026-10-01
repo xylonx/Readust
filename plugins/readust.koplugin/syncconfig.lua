@@ -217,7 +217,7 @@ function SyncConfig:pull(ui, settings, client, book_hash, meta_hash, interactive
 
   client:pullSync({
     since = 0,
-    type = 'configs',
+    sync = 'configs',
     book = book_hash,
     meta_hash = meta_hash,
   }, function(success, response)

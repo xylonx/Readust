@@ -7,6 +7,8 @@ local sha2 = require("ffi/sha2")
 local T = require("ffi/util").template
 local _ = require("gettext")
 
+local SyncConfig = require("syncconfig")
+
 local SyncAnnotations = {}
 
 -- KOReader color name → Readest color value
@@ -130,9 +132,10 @@ function SyncAnnotations:getAnnotations(ui, settings, book_hash, meta_hash, full
 end
 
 function SyncAnnotations:push(ui, settings, client, interactive, full_sync)
-    local book_hash = ui.doc_settings:readSetting("partial_md5_checksum")
-    local meta_hash = ui.doc_settings:readSetting("readust_sync") or {}
-    meta_hash = meta_hash.meta_hash_v1
+    local book_hash = SyncConfig:getDocumentIdentifier(ui)
+    -- getMetaHash generates and persists meta_hash_v1 on demand, so pushing notes
+    -- before any config sync no longer silently no-ops.
+    local meta_hash = SyncConfig:getMetaHash(ui)
     if not book_hash or not meta_hash then return end
 
     local annotations = self:getAnnotations(ui, settings, book_hash, meta_hash, full_sync)
@@ -204,8 +207,8 @@ function SyncAnnotations:pull(ui, settings, client, book_hash, meta_hash, dialog
 
     client:pullSync(
         {
-            since = full_sync and 0 or (settings.last_notes_sync_at or 0),
-            type = "notes",
+            since = 0,
+            sync = "notes",
             book = book_hash,
             meta_hash = meta_hash,
         },
@@ -337,8 +340,8 @@ function SyncAnnotations:pull(ui, settings, client, book_hash, meta_hash, dialog
                 ::continue::
             end
 
-            settings.last_notes_sync_at = os.time() * 1000
-            G_reader_settings:saveSetting("readust_sync", settings)
+            -- Note: pull uses since=0 (full fetch) and relies on dedup, so it must
+            -- not touch last_notes_sync_at, which is the push-side incremental cursor.
 
             if interactive then
                 UIManager:show(InfoMessage:new{
