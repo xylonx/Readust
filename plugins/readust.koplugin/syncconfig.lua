@@ -99,14 +99,13 @@ function SyncConfig:getCurrentBookConfig(ui)
   local config = {
     bookHash = book_hash,
     metaHash = meta_hash,
-    progress = '',
     xpointer = '',
     updatedAt = os.time() * 1000,
   }
 
   local current_page = ui:getCurrentPage()
   local page_count = ui.document:getPageCount()
-  config.progress = ('[%d,%d]'):format(current_page, page_count)
+  config.progress = { current_page, page_count }
 
   if not ui.document.info.has_pages then
     config.xpointer = ui.rolling:getLastProgress()
