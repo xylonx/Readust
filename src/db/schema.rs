@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
+use sqlx::{FromRow, prelude::Type};
 use uuid::Uuid;
 
 use crate::utils::serdefmt::{
@@ -80,7 +80,7 @@ pub struct BookConfig {
     pub rsvp_position: Option<String>,
     #[serde(with = "opt_json_obj_in_str_out", default)]
     pub search_config: Option<serde_json::Value>,
-    #[serde( with = "opt_json_obj_in_str_out", default)]
+    #[serde(with = "opt_json_obj_in_str_out", default)]
     pub view_settings: Option<serde_json::Value>,
     #[serde(with = "timestamp_mix_ts_str", default = "Utc::now")]
     pub created_at: DateTime<Utc>,
@@ -178,4 +178,48 @@ impl SortOrderKind {
             Self::Desc => "desc",
         }
     }
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[serde(rename_all = "snake_case")]
+#[sqlx(type_name = "text", rename_all = "snake_case")]
+pub enum ReplicaKind {
+    Bookshelf,
+    Dictionary,
+    Font,
+    Texture,
+    OpdsCatalog,
+    AbsServer,
+    Settings,
+}
+
+impl ReplicaKind {
+    pub fn as_str(&self) -> &str {
+        match self {
+            ReplicaKind::Bookshelf => "bookshelf",
+            ReplicaKind::Dictionary => "dictionary",
+            ReplicaKind::Font => "font",
+            ReplicaKind::Texture => "texture",
+            ReplicaKind::OpdsCatalog => "opds_catalog",
+            ReplicaKind::AbsServer => "abs_server",
+            ReplicaKind::Settings => "settings",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ReplicaRow {
+    pub user_id: Uuid,
+    pub kind: ReplicaKind,
+    pub replica_id: String,
+    pub fields_jsonb: serde_json::Value,
+    pub manifest_jsonb: Option<serde_json::Value>,
+    pub deleted_at_ts: Option<String>,
+    pub reincarnation: Option<String>,
+    pub updated_at_ts: String,
+    pub schema_version: i32,
+    #[serde(skip_deserializing, default = "Utc::now")]
+    pub created_at: DateTime<Utc>,
+    #[serde(skip_deserializing, default = "Utc::now")]
+    pub modified_at: DateTime<Utc>,
 }

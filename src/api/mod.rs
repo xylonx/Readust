@@ -1,5 +1,6 @@
 mod auth;
 mod metrics;
+mod replicas;
 mod response;
 pub mod state;
 mod storage;
@@ -13,6 +14,7 @@ pub fn router() -> Router {
         "/api",
         Router::new()
             .merge(sync::router())
+            .merge(replicas::router())
             .merge(storage::router())
             .route_layer(middleware::from_fn(auth::auth_middleware))
             .route_layer(middleware::from_fn(metrics::metrics_middleware_fn)),

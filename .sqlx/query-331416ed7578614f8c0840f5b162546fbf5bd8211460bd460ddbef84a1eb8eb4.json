@@ -1,0 +1,90 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            user_id       AS \"user_id!\",\n            kind          AS \"kind!: ReplicaKind\",\n            replica_id    AS \"replica_id!\",\n            fields_jsonb  AS \"fields_jsonb!\",\n            manifest_jsonb,\n            deleted_at_ts,\n            reincarnation,\n            updated_at_ts AS \"updated_at_ts!\",\n            schema_version AS \"schema_version!\",\n            created_at    AS \"created_at!\",\n            modified_at   AS \"modified_at!\"\n        FROM crdt_merge_replica($1, $2, $3, $4, $5, $6, $7, $8, $9)\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "kind!: ReplicaKind",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "replica_id!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "fields_jsonb!",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 4,
+        "name": "manifest_jsonb",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 5,
+        "name": "deleted_at_ts",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "reincarnation",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "updated_at_ts!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "schema_version!",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "created_at!",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "modified_at!",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Jsonb",
+        "Jsonb",
+        "Text",
+        "Text",
+        "Text",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "331416ed7578614f8c0840f5b162546fbf5bd8211460bd460ddbef84a1eb8eb4"
+}
