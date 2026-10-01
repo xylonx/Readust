@@ -47,7 +47,7 @@ pub async fn upsert_book_configs(
               progress      = EXCLUDED.progress,
               rsvp_position = EXCLUDED.rsvp_position,
               search_config = EXCLUDED.search_config,
-              view_settings = EXCLUDED.view_settings,
+              view_settings = COALESCE(EXCLUDED.view_settings, book_configs.view_settings),
               updated_at    = $11,
               deleted_at    = EXCLUDED.deleted_at
             WHERE $11 > book_configs.updated_at
